@@ -3,11 +3,16 @@ module.exports = {
         "es6": true,
         "node": true
     },
+    "parserOptions": {
+        "ecmaVersion": 2018
+    },
     "extends": "eslint:recommended",
     "globals": {
         "test": true,
         "expect": true,
-        "describe": true
+        "describe": true,
+        "beforeAll": true,
+        "afterAll": true
     },
     "rules": {
         "indent": [
