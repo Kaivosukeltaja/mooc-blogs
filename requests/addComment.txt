@@ -1,0 +1,4 @@
+POST http://localhost:3001/api/blogs/5b4e477b9f837d3710f6dd2e/comments
+Content-Type: application/json
+
+{ "text" : "This is an example comment from the REST testing tool." }

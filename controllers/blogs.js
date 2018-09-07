@@ -69,7 +69,20 @@ blogsRouter.put('/:id', async (request, response) => {
     const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blog, { new: true } )
     response.json(updatedBlog)
   } catch (error) {
-    console.log(error)
+    response.status(400).send({ error: error.toString() })
+  }
+})
+
+blogsRouter.post('/:id/comments', async (request, response) => {
+  try {
+    const blog = await Blog.findById(request.params.id)
+    if (!Array.isArray(blog.comments)) {
+      blog.comments = []
+    }
+    blog.comments.push(request.body)
+    const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blog, { new: true } )
+    response.json(updatedBlog)
+  } catch (error) {
     response.status(400).send({ error: error.toString() })
   }
 })

@@ -16,6 +16,7 @@ const blogSchema = new mongoose.Schema({
   url: { type: String, required: true },
   likes: { type: Number, default: 0 },
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  comments: [mongoose.Schema.Types.Mixed],
 })
 
 blogSchema.statics.format = (blog) => {
@@ -25,6 +26,7 @@ blogSchema.statics.format = (blog) => {
     url: blog.url,
     likes: blog.likes,
     user: blog.user,
+    comments: blog.comments,
   }
 }
 

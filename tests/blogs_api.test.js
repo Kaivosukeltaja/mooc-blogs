@@ -39,6 +39,15 @@ describe('blogs api', () => {
         .expect('Content-Type', /application\/json/)
     })
 
+    test('users are returned as json', async () => {
+      const response = await api
+        .get('/api/users')
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+
+      expect(response.body).toContainEqual({ blogs: expect.any(Array), username: testUserCredentials.username })
+    })
+
     test('POST /api/users succeeds with a fresh username', async () => {
       const usersBeforeOperation = await helper.usersInDb()
 
@@ -103,6 +112,51 @@ describe('blogs api', () => {
       const usersAfterOperation = await helper.usersInDb()
       expect(usersAfterOperation.length).toBe(usersBeforeOperation.length)
     })
+
+    test('blog can be commented', async () => {
+      const testComment = { text: 'One for uncle Bob' }
+      const blogToComment = await helper.oneBlogInDb({ author: 'Robert C. Martin' }, true)
+
+      const response = await api
+        .post(`/api/blogs/${blogToComment._id}/comments`)
+        .send(testComment)
+        .expect(200)
+
+      expect(response.body.comments).toContainEqual(testComment)
+    })
+
+    test('commenting nonexistent blogs should fail', async () => {
+      const testComment = { text: 'Nobody will ever see this' }
+
+      await api
+        .post('/api/blogs/blogidthatdoesntexist/comments')
+        .send(testComment)
+        .expect(400)
+    })
+
+    test('deleting blogs should fail', async () => {
+      const blogToDelete = await helper.oneBlogInDb({ author: 'Robert C. Martin' }, true)
+
+      await api
+        .delete(`/api/blogs/${blogToDelete._id}`)
+        .expect(401)
+    })
+  })
+
+  describe('logging in', async () => {
+    test('should succeed with correct credentials', async () => {
+      await api
+        .post('/api/login')
+        .send(testUserCredentials)
+        .expect(200)
+    })
+
+    test('should fail with wrong credentials', async () => {
+      await api
+        .post('/api/login')
+        .send({ username: 'foobar', password: 'betyoucannotrememberthisone' })
+        .expect(401)
+    })
   })
 
   describe('when authenticated', async () => {
@@ -132,7 +186,7 @@ describe('blogs api', () => {
       const blogsAfter = await helper.blogsInDb()
 
       expect(blogsAfter.length).toBe(blogsBefore.length + 1)
-      expect(blogsAfter).toContainEqual({ ...newBlog, user: expect.anything() })
+      expect(blogsAfter).toContainEqual({ ...newBlog, comments: expect.anything(), user: expect.anything() })
     })
 
     test('blog likes default to 0 if omitted', async () => {
@@ -243,6 +297,19 @@ describe('blogs api', () => {
 
       const blogAfterEdit = await helper.oneBlogInDb({ _id: blog._id })
       expect(blogAfterEdit.likes).toBe(expectedLikes)
+    })
+
+    test('editing nonexistent blogs should fail', async () => {
+      const blog = new Blog({
+        title: 'Not a real blog',
+        author: 'Nobody',
+        url: 'nowhere',
+      })
+
+      await api
+        .put('/api/blogs/123123123abcdef')
+        .send(blog)
+        .expect(400)
     })
   })
 

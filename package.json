@@ -4,10 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "npx cross-env NODE_ENV=production node index.js",
-    "watch": "npx cross-env NODE_ENV=development nodemon index.js",
-    "lint": "npx eslint .",
-    "test": "npx cross-env NODE_ENV=test jest --verbose"
+    "start": "./node_modules/.bin/cross-env NODE_ENV=production node index.js",
+    "watch": "./node_modules/.bin/cross-env NODE_ENV=development nodemon index.js",
+    "lint": "./node_modules/.bin/eslint .",
+    "test": "./node_modules/.bin/cross-env NODE_ENV=test jest --verbose",
+    "coverage": "./node_modules/.bin/cross-env NODE_ENV=test jest --coverage"
   },
   "repository": {
     "type": "git",
